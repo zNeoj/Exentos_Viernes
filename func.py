@@ -93,6 +93,61 @@ def tabla_Hist(varCol, nomCol):
     print('Paso5: Amplitud: ', '%0.2f' % amplitud, '\n')
 
 
+# Gráfica de Histograma
+def histograma(var, tit, subtit, col, cods, textoA, x_titulo, y_titulo,
+               agrupados, x_min=0, x_max=0, amplitud=0,
+               varY=None, pshape=None):
+    """
+    Crea un histograma usando plotly express.
+
+    Args:
+        var: Variable para el eje x
+        tit: Título de la gráfica
+        subtit: Subtítulo
+        col: Color
+        cods: Secuencia de colores discretos
+        textoA: Texto automático
+        x_titulo: Título del eje x
+        y_titulo: Título del eje y
+        agrupados: Boolean para determinar si los datos están agrupados
+        x_min: Valor mínimo (para agrupados)
+        x_max: Valor máximo (para agrupados)
+        amplitud: Amplitud de intervalos (para agrupados)
+        varY: Variable Y (para no agrupados)
+        pshape: Forma del patrón
+
+    Returns:
+        grafica_hist: Objeto de gráfica plotly
+    """
+    import plotly.express as px
+
+    if agrupados == True:
+        grafica_hist = px.histogram(df, x=var,
+                                    title=tit,
+                                    subtitle=subtit,
+                                    text_auto=textoA
+                                    )
+
+        grafica_hist.update_traces(marker_line_width=1,
+                                   xbins=dict(start=x_min,
+                                             end=x_max,
+                                             size=amplitud))
+
+    elif agrupados == False:
+        grafica_hist = px.histogram(df, x=var, y=varY,
+                                    pattern_shape=pshape,
+                                    title=tit,
+                                    subtitle=subtit,
+                                    color=col,
+                                    color_discrete_sequence=cods,
+                                    text_auto=textoA
+                                    )
+
+    actualiza_layout(grafica_hist, x_titulo, y_titulo)
+
+    return grafica_hist
+
+
 # Función para actualizar el layout de las graficas
 def actualiza_layout(grafica, x_title, y_title):
     grafica.update_layout(
@@ -107,3 +162,82 @@ def actualiza_layout(grafica, x_title, y_title):
         font_size=13,
         height=400
     )
+
+
+# Gráfica de Histograma con función de densidad
+import plotly.figure_factory as ff
+
+
+def grafica_densidad(var, etiqueta, color):
+    """
+    Crea un histograma con función de densidad usando plotly figure_factory.
+
+    Args:
+        var: Variable a graficar
+        etiqueta: Etiqueta para la variable
+        color: Color de la gráfica
+
+    Returns:
+        graf_dens: Objeto de gráfica plotly
+    """
+    _, amplitudA = intervalos(var)
+    amplitud = amplitudA
+
+    graf_dens = ff.create_distplot([var], [etiqueta],
+                                   show_hist='True',
+                                   show_curve='True',
+                                   curve_type='kde',
+                                   show_rug=False,
+                                   bin_size=amplitud,
+                                   colors=[color])
+
+    graf_dens.update_traces(marker_line_width=1)
+
+    graf_dens.update_layout(
+        title='Gráfica de densidad: ' + etiqueta,
+        xaxis_title='Rango de ' + etiqueta,
+        yaxis_title='Frecuencia / Densidad',
+        paper_bgcolor='white',
+        plot_bgcolor='white',
+        title_pad_l=20,
+        title_font_family='verdana',
+        title_font_color='black',
+        title_font_size=16,
+        font_size=15,
+        height=400
+    )
+
+    return graf_dens
+
+
+# Gráfica BoxPlot
+def boxplt1(yvar, cds, titulo, x_titulo, y_titulo,
+            col=None, xvar=None, puntos=None):
+    """
+    Crea un gráfico de caja (boxplot) usando plotly express.
+
+    Args:
+        yvar: Variable para el eje y
+        cds: Secuencia de colores discretos
+        titulo: Título de la gráfica
+        x_titulo: Título del eje x
+        y_titulo: Título del eje y
+        col: Color (opcional)
+        xvar: Variable para el eje x (opcional)
+        puntos: Mostrar puntos (opcional)
+
+    Returns:
+        grafica_box: Objeto de gráfica plotly
+    """
+    import plotly.express as px
+
+    grafica_box = px.box(df, x=xvar, y=yvar,
+                         points=puntos,
+                         color=col,
+                         color_discrete_sequence=cds,
+                         title=titulo
+                         )
+
+    actualiza_layout(grafica_box, x_titulo, y_titulo)
+
+    return grafica_box
