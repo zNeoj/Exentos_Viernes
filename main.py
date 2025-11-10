@@ -5,6 +5,4 @@ import io
 import math
 import plotly.express as px
 import func
-
-df = pd.read_csv('Datos/Seguros.csv')
-
+from data import df
