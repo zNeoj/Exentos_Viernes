@@ -90,10 +90,10 @@ st.markdown('---')
 
 # SIDEBAR
 st.sidebar.header('Logo empresa')
-#st.sidebar.image('Imagenes/imagenIco.ico') # luego le ponemos un png pq me truena
+st.sidebar.image('Imagenes/Logo.png') # luego le ponemos un png pq me truena
 st.sidebar.markdown('---')
 st.sidebar.header('Análisis exploratorio de DataSet')
-op = st.sidebar.radio('Selecciona: ', ['Estadisitca', 'Visualización'])
+op = st.sidebar.radio('Selecciona: ', ['Estadistica', 'Visualización'])
 
 if op == 'Visualización':
     st.sidebar.markdown('---')
@@ -195,7 +195,7 @@ if op == 'Visualización':
                     st.plotly_chart(densidad_asistencia, use_container_width = True)
 
                 with col1_3:
-                    yvar = 'Asistencia'
+                    yvar = 'Attendance'
                     cds = ['Olive']
                     titulo = 'Porcentaje de asistencia'
                     x_titulo = ('Variable asistencia')
@@ -207,7 +207,7 @@ if op == 'Visualización':
 
 
 
-        elif opcionUni == 'Tipo de Escuela':
+        elif opcionUni == 'Acceso a Internet':
             with col1:
                 col1_1, col1_2 = st.columns(2)
                 with col1_1:
@@ -241,7 +241,8 @@ if op == 'Visualización':
         opcionBi = st.sidebar.multiselect('Selecciona dos variables', ['Puntaje de examen', 'Horas estudiadas', 'Horas de sueño'])
 
         lista1 = ['Puntaje de examen', 'Horas estudiadas']
-        lista2 = ['Horas estudiadas', 'Horas de sueño']
+        lista2 = ['Puntaje de examen', 'Horas de sueño']
+
         if set(opcionBi) == set(lista1):
             varX = df['Exam_Score']
             varY = df['Hours_Studied']
@@ -255,4 +256,156 @@ if op == 'Visualización':
                 titulo = 'Puntaje de examen - Horas estudiadas'
                 sct_EC_1 = graficas.sct(varX, varY, col, cocs, x_title, y_title, tamano, titulo)
 
-                st.plotly_chart(graficas.sct_EC_1, use_container_width = True)
+                st.plotly_chart(sct_EC_1, use_container_width = True)
+            with col2:
+                col = 'School_Type'
+                cocs = 'delta'
+                tamano = 'Exam_Score'
+                x_title = 'Puntaje de examen'
+                y_title = 'Horas estudiadas'
+                titulo = 'Puntaje de examen - Horas estudiadas por Tipo de Escuela'
+                sct_EC_2 = graficas.sct(varX, varY, col, cocs, x_title, y_title, tamano, titulo)
+
+                st.plotly_chart(sct_EC_2, use_container_width = True)
+
+
+elif op == 'Estadistica':
+    # Segunda sección de interacción
+    st.sidebar.markdown('---')
+    st.sidebar.header('Análisis exploratorio')
+    opcion_explora = st.sidebar.selectbox('Selecciona:',
+                                          ['Visualizar DataFrame', 'Descripcion por Variable',
+                                           'Cuartiles', 'T Frecuencias No Agrupados',
+                                           'T Frecuencias Agrupados', 'Medidas Centrales',
+                                           'Medidas de Dispersion']
+                                          )
+
+    if opcion_explora == 'Visualizar DataFrame':
+        with st.expander('Data Set: Factores de Rendimiento Estudiantil', expanded=False):
+            st.markdown('''
+            El Data Set contiene información sobre factores que afectan el rendimiento estudiantil:
+            * **Hours_Studied**: Horas de estudio semanales
+            * **Attendance**: Porcentaje de asistencia
+            * **Parental_Involvement**: Nivel de involucramiento parental
+            * **Access_to_Resources**: Acceso a recursos educativos
+            * **Extracurricular_Activities**: Participación en actividades extracurriculares
+            * **Sleep_Hours**: Horas de sueño por noche
+            * **Previous_Scores**: Calificaciones anteriores
+            * **Motivation_Level**: Nivel de motivación del estudiante
+            * **Internet_Access**: Acceso a internet
+            * **Tutoring_Sessions**: Sesiones de tutoría
+            * **Family_Income**: Nivel de ingreso familiar
+            * **Teacher_Quality**: Calidad del profesorado
+            * **School_Type**: Tipo de escuela (Pública/Privada)
+            * **Peer_Influence**: Influencia de compañeros
+            * **Physical_Activity**: Actividad física
+            * **Learning_Disabilities**: Presencia de discapacidades de aprendizaje
+            * **Parental_Education_Level**: Nivel educativo de los padres
+            * **Distance_from_Home**: Distancia desde casa a la escuela
+            * **Gender**: Género del estudiante
+            * **Exam_Score**: Puntaje del examen final
+            ''')
+
+        st.dataframe(df, use_container_width=True)
+        col1, col2, col3 = st.columns(3, border=True)
+        with col1:
+            st.text('Tipos de datos')
+            tipos_df = df.dtypes
+            st.write(tipos_df)
+        with col2:
+            info = io.StringIO()
+            df.info(buf=info)
+            info_df = info.getvalue()
+            st.text('Información general')
+            st.text(info_df)
+        with col3:
+            st.text('Describe df')
+            describ = df.describe()
+            st.write(describ)
+
+    elif opcion_explora == 'Descripcion por Variable':
+        col1, col2, col3 = st.columns([0.3, 0.2, 0.5], border=False)
+        with col1:
+            var_col = list(df.columns)
+            opcion_col = st.selectbox('Selecciona la variable (describe()): ', var_col)
+
+        with col2:
+            describe_col = df[opcion_col].describe()
+            st.write(describe_col)
+
+    elif opcion_explora == 'Cuartiles':
+        col1, col2, col3 = st.columns([0.3, 0.2, 0.5], border=False)
+        with col1:
+            opcion_col = st.selectbox('Selecciona la variable (cuartiles): ',
+                                      ['Hours_Studied', 'Attendance', 'Previous_Scores', 'Exam_Score'])
+
+        with col2:
+            cuartiles = df[opcion_col].quantile([0.25, 0.50, 0.75])
+            st.write(cuartiles)
+
+    elif opcion_explora == 'T Frecuencias No Agrupados':
+        col1, col2, col3 = st.columns([0.2, 0.6, 0.2], border=False)
+        with col1:
+            opcion_col = st.selectbox('Selecciona la variable (Tabla Frecuencias): ',
+                                      ['School_Type', 'Internet_Access', 'Motivation_Level', 'Gender'])
+
+        with col2:
+            tablaF = sorted(df[opcion_col].unique())
+            colF = df[opcion_col]
+            nomColF = opcion_col
+            t_f = func.tablaFrecuencia(tablaF, colF, nomColF)
+            st.write(t_f)
+
+    elif opcion_explora == 'T Frecuencias Agrupados':
+        col1, col2, col3 = st.columns([0.2, 0.6, 0.2], border=False)
+        with col1:
+            opcion_col = st.selectbox('Selecciona la variable (Tabla Frecuencias): ',
+                                      ['Hours_Studied', 'Attendance', 'Previous_Scores', 'Exam_Score'])
+
+        with col2:
+            nomCol = opcion_col
+            var_col = df[opcion_col]
+            t_fA = func.tabla_Hist(var_col, nomCol)
+            st.write(t_fA)
+
+    elif opcion_explora == 'Medidas Centrales':
+        col1, col2, col3, col4 = st.columns(4, border=False)
+        with col1:
+            opcion_col = st.selectbox('Selecciona la variable (Medidas Centrales): ',
+                                      ['Hours_Studied', 'Attendance', 'Previous_Scores', 'Exam_Score'])
+
+        with col2:
+            media_v = df[opcion_col].mean()
+            st.metric('Media', '%0.2f' % media_v)
+        with col3:
+            mediana_v = df[opcion_col].median()
+            st.metric('Mediana', '%0.2f' % mediana_v)
+        with col4:
+            moda_v = df[opcion_col].mode().iloc[0] if not df[opcion_col].mode().empty else 0
+            st.metric('Moda', '%0.2f' % moda_v)
+
+    elif opcion_explora == 'Medidas de Dispersion':
+        col1, col2, col3, col4, col5, col6 = st.columns(6, border=False)
+        with col1:
+            opcion_col = st.selectbox('Selecciona la variable (Medidas Dispersión): ',
+                                      ['Hours_Studied', 'Attendance', 'Previous_Scores', 'Exam_Score'])
+
+        with col2:
+            rango_v = df[opcion_col].max() - df[opcion_col].min()
+            st.metric('Rango', '%0.2f' % rango_v)
+        with col3:
+            varianza_v = df[opcion_col].var()
+            st.metric('Varianza', '%0.2f' % varianza_v)
+        with col4:
+            std_v = df[opcion_col].std()
+            st.metric('Desviación estándar', '%0.2f' % std_v)
+        with col5:
+            asimetria_v = df[opcion_col].skew()
+            st.metric('Asimetría', '%0.3f' % asimetria_v)
+        with col6:
+            curtosis_v = df[opcion_col].kurt()
+            st.metric('Curtosis', '%0.3f' % curtosis_v)
+
+st.sidebar.markdown('---')
+st.sidebar.header('Acerca de')
+st.sidebar.info('Dashboard diseñado con fines académicos para la materia Lenguajes y Autómatas y Sistemas Programables con la profesora Verónica Quintero Rosas')
