@@ -1,12 +1,13 @@
 import math
 import pandas as pd
 from data import df
+import numpy as np
 
 # Variable global para usar en tabla_Hist
 intervalos = None
 
 
-def intervalos(var):
+def get_intervalos(var):
     global intervalos
     """
     Calcula los intervalos óptimos para un histograma usando la regla de Sturges.
@@ -91,6 +92,37 @@ def tabla_Hist(varCol, nomCol):
     # Paso5: Calcular la amplitud de cada intervalo
     amplitud = recorrido / intervalos
     print('Paso5: Amplitud: ', '%0.2f' % amplitud, '\n')
+
+    df_tf = pd.DataFrame()
+    df_tf['Clase'] = list(range(1, intervalos + 1))
+    df_tf['limInf'] = np.full(shape = intervalos, fill_value = np.nan)
+
+    for i in range(intervalos):
+        df_tf.loc[i, 'limInf'] = round(x_min + ( i * amplitud), 3)
+
+    df_tf['limSup'] = round(df_tf['limInf'] + amplitud, 3)
+    df_tf['x'] = (df_tf['limSup'] + df_tf['limInf']) / 2
+    df_tf['f'] = np.full(shape = intervalos, fill_value = np.nan)
+
+    for i in range (intervalos):
+        k = 0
+        if i == 0:
+            for j in range(n):
+                if varCol[j] <= df_tf['limSup'][i]:
+                    k = k + 1
+            df_tf.loc[i, 'f'] = k
+        else:
+            for j in range(n):
+                if(varCol[j] > df_tf['limInf'][i]) and (varCol[j] <= df_tf['limSup'][i]):
+                    k = k + 1
+            df_tf.loc[i, 'f'] = k
+
+    df_tf['Fa'] = df_tf['f'].cumsum()
+    df_tf['fr'] = round(df_tf['f'] / n, 4)
+    df_tf['Fra'] = df_tf['fr'].cumsum()
+
+
+
 
 
 # Gráfica de Histograma
@@ -180,7 +212,7 @@ def grafica_densidad(var, etiqueta, color):
     Returns:
         graf_dens: Objeto de gráfica plotly
     """
-    _, amplitudA = intervalos(var)
+    _,_, amplitudA = get_intervalos(var)
     amplitud = amplitudA
 
     graf_dens = ff.create_distplot([var], [etiqueta],
@@ -241,3 +273,5 @@ def boxplt1(yvar, cds, titulo, x_titulo, y_titulo,
     actualiza_layout(grafica_box, x_titulo, y_titulo)
 
     return grafica_box
+
+
