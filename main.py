@@ -237,36 +237,287 @@ if op == 'Visualización':
                     st.plotly_chart(hist_acceso_internet2, use_container_width=True)
 
 
+
     elif opcion == 'Dos variables':
-        opcionBi = st.sidebar.multiselect('Selecciona dos variables', ['Puntaje de examen', 'Horas estudiadas', 'Horas de sueño'])
 
-        lista1 = ['Puntaje de examen', 'Horas estudiadas']
-        lista2 = ['Puntaje de examen', 'Horas de sueño']
+        opcionBi = st.sidebar.multiselect('Selecciona dos variables',
 
-        if set(opcionBi) == set(lista1):
-            varX = df['Exam_Score']
-            varY = df['Hours_Studied']
-            col1, col2 = st.columns(2)
-            with col1:
-                col = 'Exam_Score'
-                cocs = 'delta'
-                x_title = 'Puntaje de examen'
-                y_title = 'Horas estudiadas'
-                tamano = 'Exam_Score'
-                titulo = 'Puntaje de examen - Horas estudiadas'
-                sct_EC_1 = graficas.sct(varX, varY, col, cocs, x_title, y_title, tamano, titulo)
+                                          ['Hours_Studied', 'Attendance', 'Exam_Score', 'Previous_Scores'])
 
-                st.plotly_chart(sct_EC_1, use_container_width = True)
-            with col2:
-                col = 'School_Type'
-                cocs = 'delta'
-                tamano = 'Exam_Score'
-                x_title = 'Puntaje de examen'
-                y_title = 'Horas estudiadas'
-                titulo = 'Puntaje de examen - Horas estudiadas por Tipo de Escuela'
-                sct_EC_2 = graficas.sct(varX, varY, col, cocs, x_title, y_title, tamano, titulo)
+        # Definir 3 combinaciones predefinidas
 
-                st.plotly_chart(sct_EC_2, use_container_width = True)
+        lista1 = ['Hours_Studied', 'Exam_Score']
+
+        lista2 = ['Attendance', 'Exam_Score']
+
+        lista3 = ['Previous_Scores', 'Exam_Score']
+
+        if len(opcionBi) == 2:
+
+            if set(opcionBi) == set(lista1):
+
+                # COMBINACIÓN 1: Horas Estudio vs Puntaje Examen - 4 GRÁFICAS
+
+                st.subheader("Análisis: Horas de Estudio vs Puntaje de Examen")
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+
+                    # Gráfica 1: Scatter básico
+
+                    varX = df['Hours_Studied']
+
+                    varY = df['Exam_Score']
+
+                    col = 'Hours_Studied'
+
+                    cocs = 'delta'
+
+                    x_titulo = 'Horas de Estudio'
+
+                    y_titulo = 'Puntaje de Examen'
+
+                    tamano = 'Hours_Studied'
+
+                    titulo = 'Relación Horas Estudio - Puntaje Examen'
+
+                    sct_1 = sct(varX, varY, col, cocs, x_titulo, y_titulo, tamano, titulo)
+
+                    st.plotly_chart(sct_1, use_container_width=True)
+
+                with col2:
+
+                    # Gráfica 2: Scatter por género
+
+                    col = 'Gender'
+
+                    cocs = 'viridis'
+
+                    titulo = 'Horas-Puntaje por Género'
+
+                    sct_2 = sct(varX, varY, col, cocs, x_titulo, y_titulo, tamano, titulo)
+
+                    st.plotly_chart(sct_2, use_container_width=True)
+
+                col3, col4 = st.columns(2)
+
+                with col3:
+
+                    # Gráfica 3: Scatter con marginales
+
+                    marg_x = 'histogram'
+
+                    marg_y = 'box'
+
+                    titulo = 'Horas-Puntaje con Distribuciones'
+
+                    sct_3 = sct(varX, varY, col, cocs, x_titulo, y_titulo, tamano, titulo, marg_x, marg_y)
+
+                    st.plotly_chart(sct_3, use_container_width=True)
+
+                with col4:
+
+                    # Gráfica 4: Boxplot por motivación
+
+                    yvar = 'Exam_Score'
+
+                    cds = ['red', 'blue', 'green']
+
+                    titulo = 'Puntaje por Nivel de Motivación'
+
+                    x_titulo = 'Nivel de Motivación'
+
+                    y_titulo = 'Puntaje Examen'
+
+                    col_box = 'Motivation_Level'
+
+                    xvar = 'Motivation_Level'
+
+                    box_1 = func.boxplt1(yvar, cds, titulo, x_titulo, y_titulo, col_box, xvar)
+
+                    st.plotly_chart(box_1, use_container_width=True)
+
+
+            elif set(opcionBi) == set(lista2):
+
+                # COMBINACIÓN 2: Asistencia vs Puntaje Examen - 4 GRÁFICAS DIFERENTES
+
+                st.subheader("Análisis: Asistencia vs Puntaje de Examen")
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+
+                    # Gráfica 5: Scatter por tipo de escuela
+
+                    varX = df['Attendance']
+
+                    varY = df['Exam_Score']
+
+                    col = 'School_Type'
+
+                    cocs = 'plasma'
+
+                    x_titulo = 'Asistencia (%)'
+
+                    y_titulo = 'Puntaje de Examen'
+
+                    tamano = 'Attendance'
+
+                    titulo = 'Asistencia-Puntaje por Tipo de Escuela'
+
+                    sct_1 = sct(varX, varY, col, cocs, x_titulo, y_titulo, tamano, titulo)
+
+                    st.plotly_chart(sct_1, use_container_width=True)
+
+                with col2:
+
+                    # Gráfica 6: Scatter con faceta por internet
+
+                    col = 'Internet_Access'
+
+                    cocs = 'thermal'
+
+                    titulo = 'Asistencia-Puntaje por Acceso a Internet'
+
+                    facetCol = 'Internet_Access'
+
+                    sct_2 = sct(varX, varY, col, cocs, x_titulo, y_titulo, tamano, titulo, facetCol=facetCol)
+
+                    st.plotly_chart(sct_2, use_container_width=True)
+
+                col3, col4 = st.columns(2)
+
+                with col3:
+
+                    # Gráfica 7: Scatter con violin marginal
+
+                    marg_x = 'histogram'
+
+                    marg_y = 'violin'
+
+                    titulo = 'Asistencia-Puntaje con Violines'
+
+                    sct_3 = sct(varX, varY, col, cocs, x_titulo, y_titulo, tamano, titulo, marg_x, marg_y)
+
+                    st.plotly_chart(sct_3, use_container_width=True)
+
+                with col4:
+
+                    # Gráfica 8: Histograma comparativo
+
+                    var = 'Exam_Score'
+
+                    tit = 'Distribución de Puntajes por Asistencia'
+
+                    subtit = 'Comparación de rendimiento'
+
+                    col_hist = 'Attendance'
+
+                    cods = ['red', 'orange', 'yellow']
+
+                    textoA = True
+
+                    x_titulo = 'Puntaje de Examen'
+
+                    y_titulo = 'Frecuencia'
+
+                    agrupados = False
+
+                    hist_1 = func.histograma(var, tit, subtit, col_hist, cods, textoA, x_titulo, y_titulo, agrupados)
+
+                    st.plotly_chart(hist_1, use_container_width=True)
+
+
+            elif set(opcionBi) == set(lista3):
+
+                # COMBINACIÓN 3: Calificaciones Previas vs Puntaje Examen - 3 GRÁFICAS DIFERENTES
+
+                st.subheader("Análisis: Calificaciones Previas vs Puntaje de Examen")
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+
+                    # Gráfica 9: Scatter por calidad docente
+
+                    varX = df['Previous_Scores']
+
+                    varY = df['Exam_Score']
+
+                    col = 'Teacher_Quality'
+
+                    cocs = 'rainbow'
+
+                    x_titulo = 'Calificaciones Previas'
+
+                    y_titulo = 'Puntaje de Examen'
+
+                    tamano = 'Previous_Scores'
+
+                    titulo = 'Calificaciones-Puntaje por Calidad Docente'
+
+                    sct_1 = sct(varX, varY, col, cocs, x_titulo, y_titulo, tamano, titulo)
+
+                    st.plotly_chart(sct_1, use_container_width=True)
+
+                with col2:
+
+                    # Gráfica 10: Boxplot con puntos outliers
+
+                    yvar = 'Exam_Score'
+
+                    cds = ['purple', 'blue', 'cyan', 'green']
+
+                    titulo = 'Puntaje por Calidad Docente (outliers)'
+
+                    x_titulo = 'Calidad del Profesor'
+
+                    y_titulo = 'Puntaje Examen'
+
+                    col_box = 'Teacher_Quality'
+
+                    xvar = 'Teacher_Quality'
+
+                    puntos = 'outliers'
+
+                    box_1 = func.boxplt1(yvar, cds, titulo, x_titulo, y_titulo, col_box, xvar, puntos)
+
+                    st.plotly_chart(box_1, use_container_width=True)
+
+                # Gráfica 11: Densidad para calificaciones previas
+
+                col3, col4 = st.columns(2)
+
+                with col3:
+
+                    col_prev_scores = df['Previous_Scores']
+
+                    etiq = 'Calificaciones_Previas'
+
+                    color = 'blue'
+
+                    densidad_prev = func.grafica_densidad(col_prev_scores, etiq, color)
+
+                    st.plotly_chart(densidad_prev, use_container_width=True)
+
+
+            else:
+
+                st.warning("Selecciona una de las combinaciones predefinidas para ver el análisis completo.")
+
+                st.info(
+                    "Combinaciones disponibles: Horas Estudio-Examen, Asistencia-Examen, Calificaciones Previas-Examen")
+
+
+        elif len(opcionBi) > 2:
+
+            st.warning("Por favor selecciona solo 2 variables para el análisis bivariado.")
+
+        else:
+
+            st.info("Selecciona 2 variables para comenzar el análisis.")
 
 
 elif op == 'Estadistica':
